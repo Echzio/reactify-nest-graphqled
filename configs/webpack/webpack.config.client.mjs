@@ -3,36 +3,36 @@ const path = require("node:path");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const ForkTsCheckerNotifierWebpackPlugin = require("fork-ts-checker-notifier-webpack-plugin");
 
-module.exports = (mode) => {
+module.exports = (mode, resolvePaths) => {
   const isDevelop = mode === "development";
 
   return {
     mode,
-    target: "node20.0",
-    entry: "./src/server/index.ts",
+    target: "web",
+    entry: "./src/client/index.ts",
     devtool: "inline-source-map",
     output: {
-      path: path.resolve(process.cwd(), "dist"),
-      filename: "server.js",
+      path: path.resolve(process.cwd(), "dist/assets"),
     },
-    resolve: {
-      extensions: ["*", ".ts", ".tsx", ".js"],
-      extensionAlias: {
-        ".js": [".js", ".ts"],
-        ".cjs": [".cjs", ".cts"],
-        ".mjs": [".mjs", ".mts"],
+    resolve: resolvePaths,
+    devServer: {
+      client: {
+        overlay: true,
+        progress: true,
       },
+      historyApiFallback: true,
+      hot: true,
+      compress: true,
+      port: 8080,
     },
     module: {
       rules: [
         {
           test: /\.([cm]?ts|tsx)$/,
+          exclude: /node_modules/,
           use: [
             {
-              loader: "ts-loader",
-              options: {
-                transpileOnly: true,
-              },
+              loader: "babel-loader",
             },
           ],
         },
